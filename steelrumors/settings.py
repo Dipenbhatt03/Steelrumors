@@ -25,7 +25,7 @@ SECRET_KEY = '4d!r6*g^zk+^3^a=j!^23ep&8o_&qeaw%%2wei0fx78)!zi99^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 SITE_ID=1
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [u'mysteelrumors.herokuapp.com']
 
 DJANGO_SETTINGS_MODULE='steelrumors.settings'
 # Application definition
