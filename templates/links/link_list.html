@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load comments %}
+{% block content %}
+    {% if is_paginated %}
+        <ol start="{{ page_obj.start_index }}">
+    {% else %}
+        <ol>
+    {% endif %}
+            {% for link in object_list %}
+                <form class="vote_form" action="{% url 'vote' %}" method="post">
+                    <li>[{{ link.votes}}]
+                        {% csrf_token %}
+                        <input name="link"  type="hidden" class="hidden_id" value="{{ link.id }}">
+                        <input name="voter"  type="hidden" class="hidden_id" value="{{ user.id }}">
+                        {% if user.is_authenticated %}
+                            <input type="submit" name="bt1" value="upvote">
+                            <input type="submit" name="bt1" value="downvote">
+                        {% endif %}
+
+                        <a href="{% url 'link_detail' pk=link.id %}">
+                            <b>{{ link.title }}</b>
+                        </a>
+                        {% get_comment_count for link as comment_count %}
+                        {{ comment_count }} comment{{ comment_count|pluralize }}
+                        </form>
+                    </li>
+
+                </form>
+            {% endfor %}
+        </ol>
+
+    {% if is_paginated %}
+        <div class="paginator">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Prev &laquo;</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+
+        </div>
+    {% endif %}
+{% endblock %}

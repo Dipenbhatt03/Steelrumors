@@ -1,0 +1,1 @@
+web: gunicorn Steelrumors.wsgi --log-file -
