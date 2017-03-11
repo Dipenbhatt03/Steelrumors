@@ -25,20 +25,7 @@ class LinkListView(ListView):
     template_name = "link_list.html"
     paginate_by = 5
     queryset = Link.with_votes.all()
-    #def get_queryset(self):
-     #   return super(LinkListView,self).get_queryset().annotate(votes=Count('vote')).order_by('-votes')
-    def get_context_data(self, **kwargs):
-        context=super(LinkListView,self).get_context_data(**kwargs)
-        if self.request.user.is_authenticated():
-            voted=Vote.objects.filter(voter=self.request.user)
-            links_in_page=[]
-            for link in context["object_list"]:
-                links_in_page.append(link.id)
-            voted=voted.filter(link_id__in=links_in_page)
-            voted=voted.values_list('link_id',flat=True)
-            context["voted"]=voted
-        return context
-
+  
 class LinkCreateView(CreateView):
     model = Link
     form_class = LinkCreateForm
@@ -82,12 +69,6 @@ class UserProfileEditView(UpdateView):
     def get_success_url(self):
         return reverse("profile",kwargs={"slug":self.request.user})
 
-class JSONFormMixin(object):
-    def create_response(self,vdict=dict(),valid_form=True):
-        response=HttpResponse(json.dumps(vdict),content_type="application/json")
-        response.status_code=200 if valid_form else 500
-        return response
-
 
 class VoteFormView(FormView):
     form_class = VoteForm
@@ -102,33 +83,3 @@ class VoteFormView(FormView):
         elif val=="upvote":
             Vote.objects.create(voter=user,link=link)
         return redirect("home")
-'''
-
-    def create_response(self,vdict=dict(),valid_form=True):
-        response=HttpResponse(json.dump(vdict))
-        response.status_code = 200 if valid_form else 500
-        return response
-
-    def form_valid(self, form):
-        user=self.request.user
-        link=get_object_or_404(Link,pk=form.data["link"])
-        prev_votes=Vote.objects.filter(voter=user,link=link)
-        has_voted=(prev_votes.count()>0)
-        ret={'success':1}
-
-        if not has_voted:
-            v=Vote.objects.create(voter=user,link=link)
-            ret['voteobj']=v.id
-        else:
-            prev_votes[0].delete()
-            ret['unvoted']=1
-        return self.create_response(ret,True)
-    def form_invalid(self, form):
-        ret={"success":0,"form_errors":form.errors}
-        return self.create_response(ret,False)
-'''
-
-#class VoteFormView(JSONFormMixin,VoteFormBaseView):
- #   pass
-
-
